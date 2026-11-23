@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AV Transcriber</title>
+<link rel="icon" href="img/ss-mark-512.png">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div class="plugin" id="plugin">
+  <canvas id="stars" aria-hidden="true"></canvas>
+  <span class="screw tl"></span><span class="screw tr"></span><span class="screw bl"></span><span class="screw br"></span>
+
+  <!-- ============ HEADER ============ -->
+  <header class="head">
+    <div class="brand">
+      <div class="logo" role="img" aria-label="AV Transcriber logo">
+        <span class="orbit"><b class="ox"><b class="oy"><i></i></b></b></span><span class="mark"></span>
+      </div>
+      <div class="brand-text">
+        <h1 class="chrome-text">AV TRANSCRIBER</h1>
+        <div class="sub hud">OFFLINE SPEECH-TO-TEXT <span class="sep">✦</span> V<span id="ver">2.0</span></div>
+      </div>
+    </div>
+    <div class="readouts">
+      <div class="readout" title="Which engine transcribes on this computer">
+        <span class="hud lbl">ENGINE</span><span class="val"><i class="led" id="led-engine"></i><span id="engine-label">CHECKING…</span></span>
+      </div>
+      <div class="readout" title="Speech model">
+        <span class="hud lbl">MODEL</span><span class="val"><i class="led" id="led-model"></i><span id="model-label">—</span></span>
+      </div>
+      <div class="readout" title="Nothing is ever uploaded">
+        <span class="hud lbl">NETWORK</span><span class="val"><i class="led on"></i>LOCAL ONLY</span>
+      </div>
+      <button class="help-btn" id="btn-help" title="Help Center, tour and FAQ  (?)" aria-label="Help">
+        <span class="q">?</span><span class="hud">HELP</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ============ BODY ============ -->
+  <main class="body">
+    <!-- Queue rack -->
+    <section class="rack panel" aria-label="Queue">
+      <div class="panel-title">
+        <span class="hud">QUEUE RACK<span class="folder-chip" id="queue-folder"></span></span>
+        <span class="hud dim" id="queue-meta">0 FILES</span>
+      </div>
+      <div class="toolbar">
+        <button class="btn" id="btn-add-files" title="Pick video or audio files">＋ FILES</button>
+        <button class="btn" id="btn-add-folder" title="Pick a folder of videos">＋ FOLDER</button>
+        <form class="path-form" id="path-form" autocomplete="off">
+          <input id="path-input" class="field" type="text" spellcheck="false"
+                 placeholder="…or paste a file / folder path and press Enter" aria-label="File or folder path">
+        </form>
+        <button class="btn ghost" id="btn-clear" title="Remove finished, skipped and failed rows">CLEAR DONE</button>
+      </div>
+
+      <div class="rows" id="rows" role="list"></div>
+
+      <div class="drop" id="drop">
+        <div class="drop-inner">
+          <div class="planet" aria-hidden="true">
+            <span class="ring r1"><b class="ox"><b class="oy"><i></i></b></b></span><span class="ring r2"><b class="ox"><b class="oy"><i></i></b></b></span>
+            <span class="halo"></span><span class="mark"></span>
+          </div>
+          <div class="drop-title">DROP VIDEOS OR FOLDERS HERE</div>
+          <div class="drop-sub">.mov · .mp4 · .mkv · .webm · .wmv · .mp3 · .wav · .flac · .aac · .m4a · .caf</div>
+          <div class="drop-sub dim">or use ＋ FILES / ＋ FOLDER above</div>
+        </div>
+      </div>
+      <div class="drop-overlay" id="drop-overlay"><span>RELEASE TO ADD</span></div>
+    </section>
+
+    <!-- Side panel with tabs -->
+    <section class="side panel" aria-label="Controls">
+      <nav class="tabs" role="tablist">
+        <button class="tab active" role="tab" data-tab="settings">SETTINGS</button>
+        <button class="tab" role="tab" data-tab="glossary">GLOSSARY</button>
+        <button class="tab" role="tab" data-tab="viewer">VIEWER</button>
+        <button class="tab" role="tab" data-tab="log">LOG</button>
+      </nav>
+
+      <!-- SETTINGS -->
+      <div class="tabpane active" id="tab-settings" role="tabpanel">
+        <div class="ctl always">
+          <div class="hud lbl">TEXT SIZE <span class="dim">· ⌘+ / ⌘− / ⌘0</span></div>
+          <div class="seg" data-setting="text_scale" aria-label="Text size">
+            <button data-value="1" title="Small (100%)">S</button><button data-value="1.2" title="Medium (120%), the default">M</button><button data-value="1.35" title="Large (135%)">L</button><button data-value="1.5" title="Extra large (150%)">XL</button>
+          </div>
+        </div>
+        <div class="knob-row">
+          <div class="knob-wrap">
+            <div class="knob" id="knob-model" tabindex="0" role="slider" aria-label="Quality"
+                 aria-valuemin="0" aria-valuemax="2" aria-valuenow="2">
+              <svg viewBox="0 0 120 120" aria-hidden="true">
+                <defs>
+                  <linearGradient id="kc" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#ffffff"/><stop offset=".45" stop-color="#aebdd0"/>
+                    <stop offset=".5" stop-color="#6b7d97"/><stop offset="1" stop-color="#dbe6f4"/>
+                  </linearGradient>
+                  <radialGradient id="kf" cx="50%" cy="35%" r="65%">
+                    <stop offset="0" stop-color="#1b3c7a"/><stop offset="1" stop-color="#06112b"/>
+                  </radialGradient>
+                </defs>
+                <circle cx="60" cy="60" r="56" class="knob-arc-bg"/>
+                <path class="knob-arc" id="knob-arc" d=""/>
+                <circle cx="60" cy="60" r="42" fill="url(#kc)"/>
+                <circle cx="60" cy="60" r="37" fill="url(#kf)"/>
+                <g id="knob-pointer"><rect x="58" y="27" width="4" height="16" rx="2" class="knob-ptr"/></g>
+              </svg>
+            </div>
+            <div class="knob-labels"><span data-v="0">DRAFT</span><span data-v="1">BALANCED</span><span data-v="2">BEST</span></div>
+            <div class="hud lbl center">QUALITY</div>
+            <div class="knob-value" id="knob-value">LARGE-V3-TURBO</div>
+          </div>
+          <div class="stack">
+            <div class="ctl">
+              <div class="hud lbl">LANGUAGE</div>
+              <div class="seg" data-setting="lang">
+                <button data-value="en">EN</button><button data-value="auto">AUTO</button><button data-value="es">ES</button>
+              </div>
+            </div>
+            <div class="ctl">
+              <div class="hud lbl">CAPTIONS</div>
+              <div class="seg" data-setting="captions">
+                <button data-value="standard" title="≤42 characters × 2 lines — Premiere, CapCut, DaVinci">STANDARD</button>
+                <button data-value="reels" title="Short one-line captions for vertical video">REELS</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="switches">
+          <label class="switch"><input type="checkbox" data-setting="boost_quiet"><span class="track"><span class="thumb"></span></span>
+            <span class="sw-text">Boost quiet voices<small>Helps catch audience questions</small></span></label>
+          <label class="switch"><input type="checkbox" data-setting="recursive"><span class="track"><span class="thumb"></span></span>
+            <span class="sw-text">Include subfolders<small>When adding a folder</small></span></label>
+          <label class="switch"><input type="checkbox" data-setting="force"><span class="track"><span class="thumb"></span></span>
+            <span class="sw-text">Redo finished files<small>Re-transcribe even if done</small></span></label>
+          <label class="switch"><input type="checkbox" data-setting="keep_awake"><span class="track"><span class="thumb"></span></span>
+            <span class="sw-text">Keep Mac awake<small>During long batches</small></span></label>
+        </div>
+
+        <div class="ctl">
+          <div class="hud lbl">SAVE TRANSCRIPTS</div>
+          <div class="seg" id="out-mode">
+            <button data-value="next">NEXT TO VIDEO</button><button data-value="custom">CUSTOM FOLDER</button>
+          </div>
+          <div class="out-path" id="out-path" hidden>
+            <span class="mono" id="out-path-text">—</span>
+            <button class="btn small" id="btn-outdir">CHOOSE…</button>
+          </div>
+        </div>
+
+        <div class="ctl">
+          <div class="hud lbl">OUTPUT FILES</div>
+          <div class="chips" id="formats">
+            <button data-fmt="txt" title="Clean readable transcript">TXT</button>
+            <button data-fmt="timestamped" title="Every line starts with [HH:MM:SS]">TIMESTAMPED</button>
+            <button data-fmt="srt" title="Subtitles for Premiere / CapCut / DaVinci">SRT</button>
+            <button data-fmt="vtt" title="Subtitles for web players">VTT</button>
+            <button data-fmt="docx" title="Word document">DOCX</button>
+            <button data-fmt="json" class="locked" title="Always written: marks a file as finished" disabled>JSON</button>
+          </div>
+        </div>
+        <p class="lock-note hud" id="lock-note" hidden>SETTINGS LOCKED WHILE RUNNING (TEXT SIZE STILL WORKS)</p>
+      </div>
+
+      <!-- GLOSSARY -->
+      <div class="tabpane" id="tab-glossary" role="tabpanel">
+        <p class="help">Names and terms Whisper should spell correctly, one per line. To fix a word it keeps mishearing, write <code>wrong -&gt; Right</code>.</p>
+        <textarea id="glossary-text" class="field mono" spellcheck="false" aria-label="Glossary"></textarea>
+        <div class="row-between">
+          <span class="hud dim" id="glossary-count">0 TERMS</span>
+          <button class="btn primary" id="btn-glossary-save">SAVE GLOSSARY</button>
+        </div>
+        <p class="help dim">Keep it short (a few dozen terms). After changing it, turn on <b>Redo finished files</b> to apply it to videos already done.</p>
+      </div>
+
+      <!-- VIEWER -->
+      <div class="tabpane" id="tab-viewer" role="tabpanel">
+        <div class="viewer-head">
+          <select id="viewer-select" class="field" aria-label="Transcript to view"></select>
+          <input id="viewer-search" class="field" type="search" placeholder="Search…" aria-label="Search transcript">
+        </div>
+        <div class="viewer-meta hud dim" id="viewer-meta"></div>
+        <div class="viewer-lines" id="viewer-lines"><div class="empty">Finished transcripts appear here. Click a line to copy it.</div></div>
+        <div class="viewer-actions">
+          <button class="btn small" data-open="txt">OPEN TXT</button>
+          <button class="btn small" data-open="srt">OPEN SRT</button>
+          <button class="btn small" data-open="docx">OPEN DOCX</button>
+          <button class="btn small" id="btn-copy-all">COPY ALL</button>
+          <button class="btn small ghost" id="btn-reveal">SHOW IN FINDER</button>
+        </div>
+      </div>
+
+      <!-- LOG -->
+      <div class="tabpane" id="tab-log" role="tabpanel">
+        <pre class="console mono" id="console"></pre>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ TRANSPORT ============ -->
+  <footer class="transport">
+    <div class="transport-buttons">
+      <button class="btn-start" id="btn-start"><span class="tri"></span><span>START</span></button>
+      <button class="btn-stop" id="btn-stop" disabled><span class="sq"></span><span>STOP</span></button>
+    </div>
+    <div class="meter-block">
+      <div class="now"><span class="hud lbl">NOW</span> <span id="now-text">IDLE — ADD FILES TO BEGIN</span></div>
+      <div class="meter" id="meter" aria-hidden="true"></div>
+      <div class="stages hud">
+        <span data-stage="extract">EXTRACT</span><span class="arrow">›</span>
+        <span data-stage="transcribe">TRANSCRIBE</span><span class="arrow">›</span>
+        <span data-stage="write">WRITE</span>
+      </div>
+    </div>
+    <div class="lcd">
+      <div class="lcd-cell"><span class="hud lbl">PROGRESS</span><span class="seg7" id="lcd-pct">000%</span></div>
+      <div class="lcd-cell"><span class="hud lbl">TIME LEFT</span><span class="seg7" id="lcd-eta">--:--:--</span></div>
+      <div class="lcd-cell counts">
+        <span title="Done"><i class="led on"></i><b id="c-done">0</b></span>
+        <span title="Skipped"><i class="led warn"></i><b id="c-skip">0</b></span>
+        <span title="Failed"><i class="led bad"></i><b id="c-fail">0</b></span>
+      </div>
+    </div>
+  </footer>
+</div>
+<!-- ============ GUIDED TOUR ============ -->
+<div class="tour" id="tour" hidden>
+  <div class="tour-spot" id="tour-spot"></div>
+  <div class="tour-card" id="tour-card" role="dialog" aria-modal="true" aria-labelledby="tour-title">
+    <div class="tour-step hud" id="tour-step">STEP 1 / 10</div>
+    <h3 id="tour-title"></h3>
+    <p id="tour-text"></p>
+    <div class="tour-dots" id="tour-dots"></div>
+    <div class="tour-actions">
+      <button class="btn ghost small" id="tour-skip">SKIP TOUR</button>
+      <span class="grow"></span>
+      <button class="btn small" id="tour-back">BACK</button>
+      <button class="btn primary small" id="tour-next">NEXT</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ HELP CENTER ============ -->
+<dialog class="help-dialog" id="help" closedby="any" aria-label="Help Center">
+  <div class="help-panel">
+    <aside class="help-nav">
+      <div class="help-brand"><span class="mark"></span><div><b>HELP CENTER</b><small class="hud dim">USER MANUAL</small></div></div>
+      <input class="field" id="help-search" type="search" placeholder="Search help…" aria-label="Search help">
+      <nav id="help-links"></nav>
+      <button class="btn primary" id="btn-replay-tour">▶ TAKE THE TOUR</button>
+    </aside>
+    <div class="help-body" id="help-body">
+      <button class="icon-btn help-close" id="help-close" aria-label="Close help">✕</button>
+
+      <section data-title="Quick start">
+        <h2>Quick start</h2>
+        <p class="lead">Three moves, and your videos become transcripts and subtitles. Everything stays on this Mac.</p>
+        <ol class="steps">
+          <li><b>Add your videos.</b> Drag files or whole folders from Finder onto the window, or click <kbd>＋ FILES</kbd> / <kbd>＋ FOLDER</kbd>.</li>
+          <li><b>Press START.</b> Watch each file go EXTRACT › TRANSCRIBE › WRITE. You can keep using your Mac while it works.</li>
+          <li><b>Use the results.</b> Click <kbd>▤</kbd> on a finished row to read the transcript, or import the <code>.srt</code> into Premiere or CapCut.</li>
+        </ol>
+        <p class="note">Transcripts are saved <b>next to each video</b> unless you pick a custom folder in SETTINGS. A file that's already done is skipped next time, so finished work is never repeated.</p>
+      </section>
+
+      <section data-title="The screen at a glance">
+        <h2>The screen at a glance</h2>
+        <div class="map">
+          <div class="map-head">HEADER: your logo · ENGINE · MODEL · NETWORK · ? HELP</div>
+          <div class="map-rack">QUEUE RACK<br><small>your files and their progress</small></div>
+          <div class="map-side">SETTINGS · GLOSSARY<br>VIEWER · LOG</div>
+          <div class="map-foot">TRANSPORT: START · STOP · meter · progress · time left · counters</div>
+        </div>
+        <dl class="defs">
+          <dt>ENGINE light</dt><dd>Which transcriber runs your files. <span data-os="mac">On Apple-silicon Macs (M1 or newer) it says <b>MLX · APPLE GPU</b> (the fast one).</span><span data-os="win">With an NVIDIA graphics card it says <b>CUDA · NVIDIA GPU</b> (the fast one). <b>CPU</b> means the graphics card isn't being used; see Troubleshooting.</span> Red means something isn't installed; see Troubleshooting.</dd>
+          <dt>MODEL light</dt><dd>The speech model in use. Blue = downloaded and works offline. Amber = it downloads once (internet needed) the first time you press START.</dd>
+          <dt>NETWORK · LOCAL ONLY</dt><dd>A reminder that nothing is ever uploaded.</dd>
+        </dl>
+      </section>
+
+      <section data-title="Queue rack">
+        <h2>Queue rack</h2>
+        <dl class="defs">
+          <dt><kbd>＋ FILES</kbd></dt><dd>Pick one or more video/audio files with the Finder picker.</dd>
+          <dt><kbd>＋ FOLDER</kbd></dt><dd>Add every video in a folder. Turn on <b>Include subfolders</b> in SETTINGS first to also add folders inside it.</dd>
+          <dt>Path box</dt><dd>Paste a file or folder location and press Enter (handy if you copied a path).</dd>
+          <dt><kbd>CLEAR DONE</kbd></dt><dd>Removes finished, skipped and failed rows from the list. It doesn't delete any files.</dd>
+          <dt>Drag &amp; drop</dt><dd>Drop files or folders anywhere on the window. The rack lights up with a holographic border.</dd>
+        </dl>
+        <h3>Row buttons</h3>
+        <dl class="defs">
+          <dt><kbd>▤</kbd> View</dt><dd>Opens the finished transcript in the VIEWER tab.</dd>
+          <dt><kbd>⌕</kbd> Show in Finder</dt><dd>Reveals the video in Finder (the transcripts sit right beside it).</dd>
+          <dt><kbd>✕</kbd> Remove</dt><dd>Takes the row off the list. Nothing is deleted from your drive.</dd>
+          <dt>Click a row</dt><dd>Selects it; if it's finished, the VIEWER loads it.</dd>
+        </dl>
+        <h3>Status lights</h3>
+        <table class="legend">
+          <tr><td><i class="led on"></i> READY / QUEUED</td><td>Waiting for START.</td></tr>
+          <tr><td><i class="led on pulse"></i> EXTRACT · TRANSCRIBE · WRITING</td><td>Working on it now, with its percentage.</td></tr>
+          <tr><td><i class="led ok"></i> DONE</td><td>All files written. <b>DONE · NO SPEECH</b> means the clip was silent.</td></tr>
+          <tr><td><i class="led warn"></i> NO AUDIO / STOPPED</td><td>No sound track in the file, or you pressed STOP before it finished.</td></tr>
+          <tr><td><i class="led bad"></i> FAILED</td><td>Couldn't be read or transcribed. Hover the word FAILED to see why; details are also in LOG.</td></tr>
+        </table>
+      </section>
+
+      <section data-title="Start, Stop & meters">
+        <h2>Start, Stop &amp; meters</h2>
+        <dl class="defs">
+          <dt><kbd>▶ START</kbd></dt><dd>Transcribes every READY, STOPPED and retry-able FAILED file, one at a time. Your Mac is kept awake (if that switch is on).</dd>
+          <dt><kbd>■ STOP</kbd></dt><dd>Stops cleanly within a second or two: the file in progress is set back to STOPPED, temporary audio is deleted, and no half-written transcript is left behind. Press START to continue where it left off.</dd>
+          <dt>NOW</dt><dd>The file being worked on and its position in the batch (e.g. FILE 2/5).</dd>
+          <dt>Meter</dt><dd>48 segments for the whole batch. The violet tip is the live edge.</dd>
+          <dt>EXTRACT › TRANSCRIBE › WRITE</dt><dd>The three stages of the current file. Extracting pulls the sound out of the video, transcribing turns speech into text (the long part), writing saves the files.</dd>
+          <dt>PROGRESS · TIME LEFT</dt><dd>Overall percentage and an estimate that appears after the first file finishes (it learns your Mac's real speed).</dd>
+          <dt>Counters</dt><dd><i class="led on"></i> done · <i class="led warn"></i> skipped · <i class="led bad"></i> failed.</dd>
+        </dl>
+      </section>
+
+      <section data-title="Settings">
+        <h2>Settings</h2>
+        <p>Settings are remembered between launches, and locked while a batch runs.</p>
+        <dl class="defs">
+          <dt>QUALITY knob</dt><dd><b>BEST</b> (large-v3-turbo): the most accurate; use it for final work. <b>BALANCED</b> (medium): a bit faster. <b>DRAFT</b> (small): fastest, rougher. Click the knob to step, drag it up/down, click a label, or use the arrow keys. A model you haven't used before downloads once.</dd>
+          <dt>LANGUAGE</dt><dd><b>EN</b> for English (recommended for your recordings). <b>AUTO</b> guesses from the first 30 seconds, which can be fooled by music or a non-English intro. <b>ES</b> for Spanish.</dd>
+          <dt>CAPTIONS</dt><dd><b>STANDARD</b>: up to 42 characters × 2 lines, max 7 seconds each, for Premiere, CapCut, DaVinci and YouTube. <b>REELS</b>: short one-line captions (≈18 characters) for vertical video.</dd>
+          <dt>Boost quiet voices</dt><dd>Evens out loud and quiet speakers. Turn it on if audience questions (far from the mic) come out missing, then redo those files.</dd>
+          <dt>Include subfolders</dt><dd>When adding a folder, also add the videos inside its subfolders.</dd>
+          <dt>Redo finished files</dt><dd>Normally finished files are skipped. Turn this on to transcribe them again (e.g. after editing the glossary or changing quality). Remember to turn it off afterwards.</dd>
+          <dt>Keep Mac awake</dt><dd>Stops the Mac sleeping during long batches. Keep the charger in; closing the lid on battery still sleeps.</dd>
+          <dt>SAVE TRANSCRIPTS</dt><dd><b>NEXT TO VIDEO</b> or a <b>CUSTOM FOLDER</b> (click CHOOSE…). Use a custom folder if your drive is read-only on the Mac.</dd>
+          <dt>OUTPUT FILES</dt><dd>Tap a chip to switch a format on or off. JSON is always made: it marks the file as finished.</dd>
+        </dl>
+      </section>
+
+      <section data-title="Glossary">
+        <h2>Glossary</h2>
+        <p>Names and terms Whisper should spell correctly: people (Jordan Rivera…), brands (Northwind Studio…), products (PixelForge…). One per line, then <kbd>SAVE GLOSSARY</kbd>.</p>
+        <ul class="tips">
+          <li><b>Fix a repeat mistake:</b> write <code>wrong spelling -&gt; Right Spelling</code>, e.g. <code>pixel forge -&gt; PixelForge</code>. Fixes and capital letters are applied to every output file.</li>
+          <li><b>Keep it short</b> (a few dozen terms). A very long list can make Whisper invent or repeat lines; the counter turns amber past 40.</li>
+          <li>Lines starting with <code>#</code> are notes and are ignored.</li>
+          <li>To apply a new glossary to finished videos, turn on <b>Redo finished files</b> and press START.</li>
+        </ul>
+      </section>
+
+      <section data-title="Viewer">
+        <h2>Viewer</h2>
+        <dl class="defs">
+          <dt>File menu</dt><dd>Pick any finished transcript in the queue.</dd>
+          <dt>Search</dt><dd>Type a word to show only matching lines (highlighted).</dd>
+          <dt>Click a line</dt><dd>Copies it with its timestamp, e.g. <code>[3:42] …</code>, ready for notes or edit decisions.</dd>
+          <dt><kbd>OPEN TXT / SRT / DOCX</kbd></dt><dd>Opens that file in its usual app.</dd>
+          <dt><kbd>COPY ALL</kbd></dt><dd>Copies the whole transcript text.</dd>
+          <dt><kbd>SHOW IN FINDER</kbd></dt><dd>Reveals the transcript files in Finder.</dd>
+        </dl>
+      </section>
+
+      <section data-title="Log">
+        <h2>Log</h2>
+        <p>A running commentary: what was found, each file's result and speed, and the summary. Green = done, amber = skipped/stopped, red = failed. The same information is saved as <code>log.txt</code> next to your transcripts, and the app's own diagnostics go to <code data-os="mac">~/Library/Logs/AV Transcriber.log</code><code data-os="win">%LOCALAPPDATA%\AV Transcriber\app.log</code>.</p>
+      </section>
+
+      <section data-title="Your files">
+        <h2>Your files</h2>
+        <p>Each output keeps the full video name, so <code>talk.mov</code> and <code>talk.mp4</code> never overwrite each other.</p>
+        <table class="legend files">
+          <tr><td><code>IMG_0042.MOV.txt</code></td><td>Clean paragraphs to read, quote or paste into Claude for a summary.</td></tr>
+          <tr><td><code>….timestamped.txt</code></td><td>Every line starts with <code>[HH:MM:SS]</code>, for finding moments in the edit.</td></tr>
+          <tr><td><code>….srt</code></td><td>Subtitles for Premiere, CapCut, DaVinci, Final Cut, YouTube.</td></tr>
+          <tr><td><code>….vtt</code></td><td>Subtitles for web players.</td></tr>
+          <tr><td><code>….docx</code></td><td>Word document with a timestamp per paragraph (open in Word, Pages or Google Docs; File › Export to PDF for a PDF).</td></tr>
+          <tr><td><code>….json</code></td><td>Full data with word timings. Its presence means "finished".</td></tr>
+          <tr><td><code>log.txt</code></td><td>The run record for that folder.</td></tr>
+        </table>
+      </section>
+
+      <section data-title="Premiere, CapCut & more">
+        <h2>Premiere, CapCut &amp; more</h2>
+        <h3>Adobe Premiere Pro</h3>
+        <ol class="steps small">
+          <li><b>File › Import</b> the <code>.srt</code>.</li>
+          <li>Drag it onto the timeline <b>above the video</b>, starting at the exact point where the clip starts. It becomes a captions track.</li>
+          <li>Restyle in <b>Window › Text › Captions</b> (and the Essential Graphics panel).</li>
+        </ol>
+        <h3>CapCut (desktop)</h3>
+        <ol class="steps small">
+          <li>Drag the <code>.srt</code> onto the timeline, or use <b>Captions › Import captions</b> (the menu name varies by version).</li>
+          <li>For vertical reels, set CAPTIONS to <b>REELS</b> first, and pick a <b>custom folder</b> so reels captions don't replace the standard ones.</li>
+        </ol>
+        <h3>DaVinci Resolve</h3>
+        <p><b>File › Import › Subtitle…</b>, then drag the subtitle from the Media Pool onto the timeline.</p>
+        <h3>Final Cut Pro</h3>
+        <p><b>File › Import › Captions…</b> and choose the <code>.srt</code>.</p>
+        <h3>Word, Pages, Google Docs</h3>
+        <p>Open the <code>.docx</code>. For Google Docs, upload it to Drive and open with Google Docs.</p>
+        <p class="note"><b>Clip starts later in your timeline?</b> Captions are timed from the start of the video file. Slide the caption track so its start lines up with the start of the clip.</p>
+      </section>
+
+      <section data-title="Tips for best results">
+        <h2>Tips for best results</h2>
+        <ul class="tips">
+          <li><b>Use BEST quality for anything you'll publish</b>; DRAFT is for quick checks.</li>
+          <li><b>Set the language</b> to EN rather than AUTO for English talks.</li>
+          <li><b>Add names to the glossary before</b> a big batch: hosts, guests, brands, products.</li>
+          <li><b>Charger in, lid open</b> for long batches.</li>
+          <li><b>Test one short clip first</b> when trying a new camera or mic setup.</li>
+          <li><b>Audience questions missing?</b> Turn on Boost quiet voices and redo that file.</li>
+          <li><b>Big files on a spinning external drive</b> take a few extra seconds each to read during EXTRACT. That's normal.</li>
+        </ul>
+      </section>
+
+      <section data-title="FAQ">
+        <h2>FAQ</h2>
+        <details><summary>Does anything get uploaded?</summary><p>No. The app only talks to a tiny engine running on this Mac (127.0.0.1). The internet is used only to download a speech model the first time you use it.</p></details>
+        <details><summary>How long does it take?</summary><p>It depends on the Mac and the quality setting. The first file shows the real speed in the LOG (e.g. "12× real time" means a 48-minute video takes about 4 minutes). Apple-silicon Macs are typically several times faster than real time on BEST.</p></details>
+        <details><summary>Why does a file say "already done"?</summary><p>It has a finished <code>.json</code> next to it from an earlier run, so it's skipped. To transcribe it again, turn on <b>Redo finished files</b>.</p></details>
+        <details><summary>Can I use my Mac while it works?</summary><p>Yes. It may feel a little busier during TRANSCRIBE; everything else is fine.</p></details>
+        <details><summary>What if I close the window in the middle?</summary><p>It stops cleanly, like pressing STOP. Open the app, add the same files, press START, and finished ones are skipped.</p></details>
+        <details><summary>Where do the transcripts go?</summary><p>Next to each video, unless SAVE TRANSCRIPTS is set to a custom folder. Click <kbd>⌕</kbd> on a row to jump there.</p></details>
+        <details><summary>Names are spelled wrong. What can I do?</summary><p>Add them to the GLOSSARY (or a <code>wrong -&gt; Right</code> fix), save, turn on Redo finished files, and run again.</p></details>
+        <details><summary>Can it label who's speaking?</summary><p>Not yet. New paragraphs start after pauses of 2+ seconds, which usually marks a question or answer. Speaker labels are on the roadmap.</p></details>
+        <details><summary>My camera recorded two audio tracks. Which is used?</summary><p>The first one that can be decoded. To choose another, use the Terminal version with <code>--audio-track 2</code>, or set it per file in <code>config.toml</code>.</p></details>
+        <details><summary>What do DRAFT / BALANCED / BEST download?</summary><p>Each quality level uses its own model (about 0.5–1.6 GB), downloaded once the first time you press START with it.</p></details>
+        <details><summary>Which file types work?</summary><p>Video: .mov .mp4 .mkv .webm .wmv. Audio: .mp3 .wav .flac .aac .m4a, and .caf (Apple Voice Memos and other Core Audio recordings). Upper-case names like .MOV are fine. Hidden files and macOS "._" files are ignored.</p></details>
+        <details><summary>How do I update AV Transcriber?</summary><p><span data-os="mac">In Terminal: <code>cd ~/Documents/AVTool &amp;&amp; bash update.command</code>.</span><span data-os="win">Double-click <code>update_windows.bat</code> in the AV Transcriber folder.</span> Your glossary, settings and transcripts are kept.</p></details>
+      </section>
+
+      <section data-title="Troubleshooting">
+        <h2>Troubleshooting</h2>
+        <dl class="defs">
+          <dt>Every file FAILED with "No such file or directory: 'ffmpeg'"</dt><dd>Fixed in V1.2. Run the update (see FAQ), then press START again.</dd>
+          <dt data-os="win">ENGINE says CPU, or CPU · GPU UNAVAILABLE</dt><dd data-os="win">The first START of each session runs a quick, safe GPU check; if the NVIDIA card can't be used, AV Transcriber switches to the CPU instead of crashing, and the LOG says why. Usually the fix is to update the NVIDIA driver (NVIDIA app / GeForce Experience or nvidia.com/drivers, version 528 or newer), restart, then run <code>setup_windows.bat</code> again. It still works on CPU, just slower; DRAFT or BALANCED quality helps.</dd>
+          <dt data-os="win">The app folder is inside OneDrive</dt><dd data-os="win">OneDrive tries to upload the app's ~3 GB of engine files and can make them online-only, which breaks the app. Move the whole folder to <code>C:\Users\(you)\AV Transcriber</code>, then double-click <code>setup_windows.bat</code> there (it recreates the shortcuts).</dd>
+          <dt data-os="win">Windows says "Windows protected your PC"</dt><dd data-os="win">That's SmartScreen being careful with downloaded scripts. Click <b>More info › Run anyway</b>. To avoid it, right-click the ZIP › Properties › tick <b>Unblock</b> before extracting.</dd>
+          <dt>ENGINE light is red</dt><dd>Something isn't installed. <span data-os="mac">In Terminal: <code>cd ~/Documents/AVTool &amp;&amp; bash setup_mac.command</code>.</span><span data-os="win">Double-click <code>setup_windows.bat</code> in the AV Transcriber folder.</span></dd>
+          <dt>"Can't write to …"</dt><dd>The drive is read-only on this Mac (often NTFS-formatted). Choose SAVE TRANSCRIPTS › CUSTOM FOLDER.</dd>
+          <dt data-os="mac">macOS asks about "files on a removable volume"</dt><dd data-os="mac">Click <b>Allow</b> so AV Transcriber can read your external drive. To change it later: System Settings › Privacy &amp; Security › Files and Folders.</dd>
+          <dt>A file shows NO AUDIO</dt><dd>That video has no sound track (screen recordings sometimes don't). Nothing to transcribe.</dd>
+          <dt>Model download is stuck</dt><dd>Check the internet connection, then press START again; it continues the download.</dd>
+          <dt>Text repeats, or lines appear over silence</dt><dd>The app filters most of these automatically. Note the file and time and let your developer know.</dd>
+          <dt>Still stuck?</dt><dd>Open the LOG tab, copy the red lines, and send them along with a screenshot.</dd>
+        </dl>
+      </section>
+
+      <section data-title="Keyboard shortcuts">
+        <h2>Keyboard shortcuts</h2>
+        <table class="legend keys">
+          <tr><td><kbd>⌘</kbd> <kbd>O</kbd></td><td>Add files</td></tr>
+          <tr><td><kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>O</kbd></td><td>Add a folder</td></tr>
+          <tr><td><kbd>⌘</kbd> <kbd>↩</kbd></td><td>START</td></tr>
+          <tr><td><kbd>⌘</kbd> <kbd>.</kbd></td><td>STOP</td></tr>
+          <tr><td><kbd>?</kbd></td><td>Open this Help Center</td></tr>
+          <tr><td><kbd>esc</kbd></td><td>Close Help or the tour</td></tr>
+          <tr><td><kbd>←</kbd> <kbd>→</kbd></td><td>Back / next in the tour; turn the QUALITY knob when it's selected</td></tr>
+        </table>
+      </section>
+
+      <section data-title="Install & update">
+        <h2>Install &amp; update</h2>
+        <div data-os="mac">
+          <h3>Mac</h3>
+          <ol class="steps small">
+            <li>In Terminal, inside the AV Transcriber folder: <code>bash setup_mac.command</code> (one time, about 15 minutes).</li>
+            <li>Double-click <b>AV Transcriber.app</b> and drag it to the Dock.</li>
+            <li>To update later: <code>bash update.command</code>.</li>
+          </ol>
+        </div>
+        <div data-os="win">
+          <h3>Windows 10 / 11</h3>
+          <ol class="steps small">
+            <li>Right-click the downloaded ZIP › Properties › tick <b>Unblock</b> › OK, then extract it to <b>C:\Users\(you)\AV Transcriber</b> (outside OneDrive).</li>
+            <li>Double-click <b>setup_windows.bat</b> (one time, about 15–20 minutes: it installs ffmpeg, Python, the NVIDIA engine and the speech model).</li>
+            <li>Open <b>AV Transcriber</b> from the Start menu or the desktop shortcut. Right-click its taskbar icon › <b>Pin to taskbar</b> to keep it handy.</li>
+            <li>To update later: double-click <b>update_windows.bat</b>.</li>
+          </ol>
+          <p class="note">On Windows, drag and drop works for files. For whole folders, use <kbd>＋ FOLDER</kbd>.</p>
+        </div>
+        <p>Both computers can use the same external drive: finished files are recognised on either, so nothing gets transcribed twice.</p>
+      </section>
+
+      <section data-title="Privacy & updates">
+        <h2>Privacy &amp; updates</h2>
+        <ul class="tips">
+          <li>All transcription happens on this Mac. No account, no upload, no usage tracking.</li>
+          <li>The engine only listens to this Mac (127.0.0.1) and requires a secret key that changes every launch.</li>
+          <li>Update any time with <code data-os="mac">bash update.command</code><b data-os="win">update_windows.bat</b>; it keeps your glossary, settings and transcripts.</li>
+          <li>AV Transcriber is built on free, open-source parts: OpenAI Whisper, mlx-whisper, faster-whisper, FFmpeg, pywebview and the Inter typeface.</li>
+        </ul>
+      </section>
+    </div>
+  </div>
+</dialog>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+<script src="platform.js"></script>
+<script src="stars.js"></script>
+<script src="app.js"></script>
+<script src="help.js"></script>
+</body>
+</html>

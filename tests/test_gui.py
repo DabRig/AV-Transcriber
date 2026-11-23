@@ -36,7 +36,7 @@ def app(tmp_path, clip_source, monkeypatch):
     clips = tmp_path / "clips"
     shutil.copytree(clip_source, clips)
     glossary = tmp_path / "glossary.txt"
-    glossary.write_text("Evan\nSmooth Scaling\n")
+    glossary.write_text("Jordan\nNorthwind Studio\n")
     state = srv.AppState(backend_choice="test", temp_root=tmp_path / "temp")
     state.config["glossary"] = str(glossary)
     state.settings["keep_awake"] = False
@@ -87,7 +87,7 @@ def test_locked_down(app):
 
 def test_queue_run_and_view(app):
     r = call(app, "/api/add", {"paths": [str(app["clips"])]})
-    assert r["added"] == 16  # 18 files minus the ._sample.mov and .hidden.mov junk
+    assert r["added"] == 17  # 19 files minus the ._sample.mov and .hidden.mov junk
     s = wait_until(app, lambda s: not any(i["status"] == "probing" for i in s["items"]))
     by_name = {i["name"]: i for i in s["items"]}
     assert by_name["corrupt.mov"]["status"] == "failed"
@@ -102,8 +102,8 @@ def test_queue_run_and_view(app):
     assert e.value.code == 409
     s = wait_until(app, lambda s: not s["running"])
     statuses = {i["name"]: i["status"] for i in s["items"]}
-    assert list(statuses.values()).count("done") == 14
-    assert s["last_run"]["counts"]["done"] == 14
+    assert list(statuses.values()).count("done") == 15
+    assert s["last_run"]["counts"]["done"] == 15
 
     item = by_name["sample.mov"]
     t = call(app, f"/api/transcript?id={item['id']}")
@@ -144,10 +144,10 @@ def test_settings_and_glossary(app, tmp_path):
     assert json.loads((tmp_path / "gui_settings.json").read_text())["model"] == "medium"
 
     g = call(app, "/api/glossary")
-    assert g["terms"] == ["Evan", "Smooth Scaling"]
-    r = call(app, "/api/glossary", {"text": "Evan\nlightening os -> Lightning OS"})
-    assert r["terms"] == ["Evan", "Lightning OS"]
-    assert "Lightning OS" in app["glossary"].read_text()
+    assert g["terms"] == ["Jordan", "Northwind Studio"]
+    r = call(app, "/api/glossary", {"text": "Jordan\npixel forge -> PixelForge"})
+    assert r["terms"] == ["Jordan", "PixelForge"]
+    assert "PixelForge" in app["glossary"].read_text()
 
 
 def test_custom_output_folder(app, tmp_path):

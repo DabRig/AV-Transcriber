@@ -7,7 +7,7 @@
 
   // ------------------------------------------------------------- tour
   const STEPS = [
-    { target: null, title: "Welcome aboard, Sebastian",
+    { target: null, title: "Welcome aboard",
       text: "AV Transcriber turns your videos into <b>transcripts and subtitles</b>, right here on your Mac. Nothing is uploaded. This one-minute tour shows you around." },
     { target: ".toolbar", title: "Add your videos",
       text: "Click <b>＋ FILES</b> or <b>＋ FOLDER</b>, paste a path, or simply <b>drag videos and folders from Finder</b> onto the window." },
@@ -22,7 +22,7 @@
     { target: ".switches", tab: "settings", title: "Handy switches",
       text: "<b>Boost quiet voices</b> helps catch audience questions. <b>Redo finished files</b> re-transcribes videos already done. <b>Keep Mac awake</b> guards long batches." },
     { target: ".tabs", title: "Glossary, Viewer, Log",
-      text: "<b>GLOSSARY</b>: names to spell right (Evan, Smooth Scaling…). <b>VIEWER</b>: read, search and copy finished transcripts. <b>LOG</b>: the play-by-play." },
+      text: "<b>GLOSSARY</b>: names to spell right (people, brands, products). <b>VIEWER</b>: read, search and copy finished transcripts. <b>LOG</b>: the play-by-play." },
     { target: ".readouts", title: "Status lights",
       text: "<b>ENGINE</b> shows the transcriber (MLX · Apple GPU on your Mac). <b>MODEL</b> lights blue once it's downloaded. <b>LOCAL ONLY</b>: nothing leaves this Mac." },
     { target: "#btn-help", title: "Help is always here",

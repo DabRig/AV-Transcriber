@@ -732,3 +732,9 @@ html.os-win [data-os="mac"], html:not(.os-win) [data-os="win"] { display: none !
 /* Windows (Edge) paints the scrollbar corner white unless told otherwise. */
 ::-webkit-scrollbar-corner { background: transparent; }
 .console { overflow-x: hidden; overflow-wrap: anywhere; }
+
+/* Queue header: a long folder name shrinks (with …) instead of running into the file count. */
+.rack .panel-title { gap: 0.75rem; }
+.rack .panel-title > .hud:first-child { flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; }
+.rack .folder-chip { max-width: calc(100% - 7rem); }
+#queue-meta { flex: none; }

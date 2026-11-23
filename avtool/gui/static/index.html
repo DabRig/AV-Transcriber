@@ -66,7 +66,7 @@
             <span class="halo"></span><span class="mark"></span>
           </div>
           <div class="drop-title">DROP VIDEOS OR FOLDERS HERE</div>
-          <div class="drop-sub">.mov · .mp4 · .mkv · .webm · .wmv · .mp3 · .wav · .flac · .aac · .m4a</div>
+          <div class="drop-sub">.mov · .mp4 · .mkv · .webm · .wmv · .mp3 · .wav · .flac · .aac · .m4a · .caf</div>
           <div class="drop-sub dim">or use ＋ FILES / ＋ FOLDER above</div>
         </div>
       </div>
@@ -278,7 +278,7 @@
           <div class="map-foot">TRANSPORT: START · STOP · meter · progress · time left · counters</div>
         </div>
         <dl class="defs">
-          <dt>ENGINE light</dt><dd>Which transcriber runs your files. <span data-os="mac">On your M2 Pro it says <b>MLX · APPLE GPU</b> (the fast one).</span><span data-os="win">On your NVIDIA PCs it says <b>CUDA · NVIDIA GPU</b> (the fast one). <b>CPU</b> means the graphics card isn't being used; see Troubleshooting.</span> Red means something isn't installed; see Troubleshooting.</dd>
+          <dt>ENGINE light</dt><dd>Which transcriber runs your files. <span data-os="mac">On Apple-silicon Macs (M1 or newer) it says <b>MLX · APPLE GPU</b> (the fast one).</span><span data-os="win">With an NVIDIA graphics card it says <b>CUDA · NVIDIA GPU</b> (the fast one). <b>CPU</b> means the graphics card isn't being used; see Troubleshooting.</span> Red means something isn't installed; see Troubleshooting.</dd>
           <dt>MODEL light</dt><dd>The speech model in use. Blue = downloaded and works offline. Amber = it downloads once (internet needed) the first time you press START.</dd>
           <dt>NETWORK · LOCAL ONLY</dt><dd>A reminder that nothing is ever uploaded.</dd>
         </dl>
@@ -341,9 +341,9 @@
 
       <section data-title="Glossary">
         <h2>Glossary</h2>
-        <p>Names and terms Whisper should spell correctly: people (Evan, Dylan…), brands (Smooth Scaling, Lightning OS…). One per line, then <kbd>SAVE GLOSSARY</kbd>.</p>
+        <p>Names and terms Whisper should spell correctly: people (Jordan Rivera…), brands (Northwind Studio…), products (PixelForge…). One per line, then <kbd>SAVE GLOSSARY</kbd>.</p>
         <ul class="tips">
-          <li><b>Fix a repeat mistake:</b> write <code>wrong spelling -&gt; Right Spelling</code>, e.g. <code>Lightening OS -&gt; Lightning OS</code>. Fixes and capital letters are applied to every output file.</li>
+          <li><b>Fix a repeat mistake:</b> write <code>wrong spelling -&gt; Right Spelling</code>, e.g. <code>pixel forge -&gt; PixelForge</code>. Fixes and capital letters are applied to every output file.</li>
           <li><b>Keep it short</b> (a few dozen terms). A very long list can make Whisper invent or repeat lines; the counter turns amber past 40.</li>
           <li>Lines starting with <code>#</code> are notes and are ignored.</li>
           <li>To apply a new glossary to finished videos, turn on <b>Redo finished files</b> and press START.</li>
@@ -408,7 +408,7 @@
         <ul class="tips">
           <li><b>Use BEST quality for anything you'll publish</b>; DRAFT is for quick checks.</li>
           <li><b>Set the language</b> to EN rather than AUTO for English talks.</li>
-          <li><b>Add names to the glossary before</b> a big batch: Evan, guests, brands.</li>
+          <li><b>Add names to the glossary before</b> a big batch: hosts, guests, brands, products.</li>
           <li><b>Charger in, lid open</b> for long batches.</li>
           <li><b>Test one short clip first</b> when trying a new camera or mic setup.</li>
           <li><b>Audience questions missing?</b> Turn on Boost quiet voices and redo that file.</li>
@@ -428,7 +428,7 @@
         <details><summary>Can it label who's speaking?</summary><p>Not yet. New paragraphs start after pauses of 2+ seconds, which usually marks a question or answer. Speaker labels are on the roadmap.</p></details>
         <details><summary>My camera recorded two audio tracks. Which is used?</summary><p>The first one that can be decoded. To choose another, use the Terminal version with <code>--audio-track 2</code>, or set it per file in <code>config.toml</code>.</p></details>
         <details><summary>What do DRAFT / BALANCED / BEST download?</summary><p>Each quality level uses its own model (about 0.5–1.6 GB), downloaded once the first time you press START with it.</p></details>
-        <details><summary>Which file types work?</summary><p>Video: .mov .mp4 .mkv .webm .wmv. Audio: .mp3 .wav .flac .aac .m4a. Upper-case names like .MOV are fine. Hidden files and macOS "._" files are ignored.</p></details>
+        <details><summary>Which file types work?</summary><p>Video: .mov .mp4 .mkv .webm .wmv. Audio: .mp3 .wav .flac .aac .m4a, and .caf (Apple Voice Memos and other Core Audio recordings). Upper-case names like .MOV are fine. Hidden files and macOS "._" files are ignored.</p></details>
         <details><summary>How do I update AV Transcriber?</summary><p><span data-os="mac">In Terminal: <code>cd ~/Documents/AVTool &amp;&amp; bash update.command</code>.</span><span data-os="win">Double-click <code>update_windows.bat</code> in the AV Transcriber folder.</span> Your glossary, settings and transcripts are kept.</p></details>
       </section>
 

@@ -75,7 +75,7 @@ def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="transcribe.py",
         description="Free, offline transcripts and subtitles for video and audio files.",
-        epilog='Example:  python transcribe.py "/Volumes/LaCie/Shoot" --lang en',
+        epilog='Example:  python transcribe.py "/Volumes/MyDrive/Shoot" --lang en',
     )
     p.add_argument("path", nargs="?", help="a folder or a single file (drag it into the Terminal window)")
     p.add_argument("--model", help="large-v3-turbo (best, default), medium, small (fast drafts)…")

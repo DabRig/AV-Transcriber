@@ -1,6 +1,7 @@
-# MOV Transcriber — Build Spec
+# Design brief — where AV Transcriber started
 
-Oct 6, 2026 · @Sebastian
+> The original brief this app was built from (Oct 6, 2026, by Sebastian Success).
+> Kept for history; the app has since grown well past it — see [CHANGELOG.md](CHANGELOG.md).
 
 ## Goal
 
@@ -70,7 +71,7 @@ Outputs keep the full source name, extension included (`interview.mov` → `inte
 - One bad file never stops the batch — log it and move on. Print a summary at the end: done / skipped / failed.
 - Keep the computer awake during long runs (`caffeinate` on Mac).
 - Check free disk space before starting: at least 2× the largest temp WAV plus room for outputs.
-- Custom vocabulary: an optional `glossary.txt` of names/terms (e.g. Lightning OS, Smooth Scaling). Pass it as `hotwords` in faster-whisper, or as `initial_prompt` in mlx-whisper. Keep it short — Whisper only reads \~200 tokens of prompt, and a long one can cause repeated or invented lines.
+- Custom vocabulary: an optional `glossary.txt` of names/terms (e.g. Northwind Studio, PixelForge). Pass it as `hotwords` in faster-whisper, or as `initial_prompt` in mlx-whisper. Keep it short — Whisper only reads \~200 tokens of prompt, and a long one can cause repeated or invented lines.
 
 **Interface**
 

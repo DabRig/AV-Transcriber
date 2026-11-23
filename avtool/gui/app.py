@@ -66,7 +66,7 @@ def _webview_dialogs(window):
     dialog = getattr(webview, "FileDialog", None)
     open_kind = dialog.OPEN if dialog else webview.OPEN_DIALOG
     folder_kind = dialog.FOLDER if dialog else webview.FOLDER_DIALOG
-    media = ("Video & audio (*.mov;*.MOV;*.mp4;*.MP4;*.mkv;*.webm;*.wmv;*.mp3;*.wav;*.flac;*.aac;*.m4a)",
+    media = ("Video & audio (*.mov;*.MOV;*.mp4;*.MP4;*.mkv;*.webm;*.wmv;*.mp3;*.wav;*.flac;*.aac;*.m4a;*.caf;*.CAF)",
              "All files (*.*)")
 
     def choose(kind: str) -> list[str]:

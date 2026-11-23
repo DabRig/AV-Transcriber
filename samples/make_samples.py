@@ -3,7 +3,7 @@
 plus the awkward cases the tool must survive.
 
     python samples/make_samples.py                      # spoken test clips (Mac voice)
-    python samples/make_samples.py --from "/Volumes/LaCie/Shoot/IMG_0042.MOV" --start 60 --seconds 90
+    python samples/make_samples.py --from "/Volumes/MyDrive/Shoot/IMG_0042.MOV" --start 60 --seconds 90
                                                         # cut real audio from one of your files
 
 Speech comes from (first that works): --from FILE, the Mac's built-in `say`
@@ -24,8 +24,8 @@ HERE = Path(__file__).resolve().parent
 CLIPS = HERE / "clips"
 
 SCRIPT = (
-    "Hi everyone, I'm Evan. Welcome to the Smooth Scaling workshop. "
-    "Today I'll walk you through Lightning OS, step by step. "
+    "Hi everyone, I'm Jordan. Welcome to the Northwind Studio workshop. "
+    "Today I'll walk you through PixelForge, step by step. "
     "Does anyone have a question before we start? "
     "Yes, great question. Let's get started."
 )
@@ -139,10 +139,12 @@ def main() -> None:
             "sample.flac": speech_in + ["-c:a", "flac"],
             "sample.aac": speech_in + ["-c:a", "aac", "-f", "adts"],
             "sample.m4a": speech_in + ["-c:a", "aac"],
+            # Apple Core Audio Format, as Voice Memos and other Apple apps save it
+            "sample.caf": speech_in + ["-c:a", "alac"],
             # camera-style upper-case extension
             "CAMERA_CLIP.MOV": video + speech_in + h264 + ["-c:a", "aac", "-shortest"],
             # spaces, accents, emoji and an apostrophe in the name
-            "Évan’s talk 🎤 (take 2).mp4": video + speech_in + h264 + ["-c:a", "aac", "-shortest"],
+            "Zoë’s talk 🎤 (take 2).mp4": video + speech_in + h264 + ["-c:a", "aac", "-shortest"],
             # two audio tracks: 1 = a tone ("camera mic"), 2 = the speech ("lav")
             "two_tracks.mov": video + ["-f", "lavfi", "-i", f"sine=frequency=220:duration={length}"] + speech_in
                               + ["-map", "0:v", "-map", "1:a", "-map", "2:a"] + h264 + ["-c:a", "aac", "-shortest"],

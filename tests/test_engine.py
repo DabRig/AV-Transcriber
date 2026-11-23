@@ -55,7 +55,7 @@ def test_m4a_through_faster_whisper(tiny_model, tmp_path):
 def test_speech_reaches_decoder_and_word_timings(tiny_model, tmp_path):
     wav = tmp_path / "speech.wav"
     subprocess.run(["espeak-ng", "-s", "150", "-w", str(wav),
-                    "Hi everyone, I'm Evan. Welcome to the Smooth Scaling workshop. Any questions?"], check=True)
+                    "Hi everyone, I'm Jordan. Welcome to the Northwind Studio workshop. Any questions?"], check=True)
     src = tmp_path / "talk.m4a"
     subprocess.run(["ffmpeg", "-loglevel", "error", "-i", str(wav), "-af", "apad=pad_dur=2",
                     "-c:a", "aac", str(src)], check=True)
@@ -80,3 +80,13 @@ def test_gpu_failure_falls_back_to_cpu(tiny_model, tmp_path, capsys):
     subprocess.run(["ffmpeg", "-loglevel", "error", "-f", "lavfi", "-i", "sine=frequency=300:duration=3",
                     "-ac", "1", "-ar", "16000", "-c:a", "pcm_s16le", str(wav)], check=True)
     assert b.transcribe(wav, 3.0, "en", None, None).language == "en"
+
+
+
+def test_caf_through_faster_whisper(tiny_model, tmp_path):
+    """A Voice Memos-style .caf through the real faster-whisper engine."""
+    src = tmp_path / "New Recording 3.caf"
+    subprocess.run(["ffmpeg", "-loglevel", "error", "-f", "lavfi", "-i", "sine=frequency=300:duration=5",
+                    "-ar", "48000", "-c:a", "alac", str(src)], check=True)
+    assert _run(src, tiny_model, tmp_path / "out", tmp_path) == 0
+    assert (tmp_path / "out" / "New Recording 3.caf.json").exists()

@@ -512,6 +512,17 @@ class TestBackend(Backend):
     name = "test"
     CHUNK = 0.4  # seconds per placeholder word
     WORDS = ("alpha", "bravo", "charlie", "delta", "echo", "foxtrot", "golf", "hotel")
+    # Demo mode (AVTOOL_DEMO=1, used to record the README GIFs): sentences from a
+    # sample talk instead of placeholder words. Still not real speech recognition.
+    DEMO = ("Welcome back, everyone. Today we're breaking down how a small studio "
+            "plans a full launch week. Before we start, does anyone have a question? "
+            "Great question, Jordan. The short answer is to plan the story first and "
+            "the shots second. We script every reel in a single shared document. "
+            "Then we batch record on Monday and edit on Tuesday. Captions go on "
+            "everything, because most people watch with the sound off. Northwind "
+            "Studio grew its audience this way in one season. Let's look at the "
+            "numbers together. Any other questions before we move on? Perfect, "
+            "let's keep going.").split()
 
     def transcribe(self, wav, duration, language, prompt, progress) -> Transcript:
         if os.environ.get("AVTOOL_TEST_FAIL_ON") and os.environ["AVTOOL_TEST_FAIL_ON"] in str(wav):
@@ -529,7 +540,8 @@ class TestBackend(Backend):
                 peak = max((abs(s) for s in samples), default=0)
                 start = index * self.CHUNK
                 if peak > 600:
-                    text = self.WORDS[len(words) % len(self.WORDS)]
+                    vocab = self.DEMO if os.environ.get("AVTOOL_DEMO") else self.WORDS
+                    text = vocab[len(words) % len(vocab)]
                     words.append(Word(start, start + self.CHUNK * 0.9, " " + text))
                 index += 1
                 if progress:
@@ -540,6 +552,16 @@ class TestBackend(Backend):
                 if os.environ.get("AVTOOL_TEST_INTERRUPT_AT") and start >= float(os.environ["AVTOOL_TEST_INTERRUPT_AT"]):
                     raise KeyboardInterrupt
         segments: list[Segment] = []
+        if os.environ.get("AVTOOL_DEMO"):  # one segment per sentence
+            chunk: list[Word] = []
+            for w in words:
+                chunk.append(w)
+                if w.text.endswith((".", "?", "!")) or len(chunk) >= 14:
+                    segments.append(Segment(chunk[0].start, chunk[-1].end, "".join(x.text for x in chunk), chunk))
+                    chunk = []
+            if chunk:
+                segments.append(Segment(chunk[0].start, chunk[-1].end, "".join(x.text for x in chunk), chunk))
+            return Transcript(segments, language or "en")
         for i in range(0, len(words), 9):
             chunk = words[i:i + 9]
             chunk[-1].text += "."

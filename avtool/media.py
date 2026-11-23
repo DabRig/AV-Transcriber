@@ -19,7 +19,7 @@ from pathlib import Path
 from typing import Callable, Optional
 
 VIDEO_EXTS = {".mov", ".mp4", ".mkv", ".webm", ".wmv"}
-AUDIO_EXTS = {".mp3", ".wav", ".flac", ".aac", ".m4a"}
+AUDIO_EXTS = {".mp3", ".wav", ".flac", ".aac", ".m4a", ".caf"}  # .caf: Apple Core Audio (Voice Memos)
 SUPPORTED_EXTS = VIDEO_EXTS | AUDIO_EXTS
 
 WAV_BYTES_PER_SECOND = 16_000 * 2  # 16 kHz, mono, 16-bit

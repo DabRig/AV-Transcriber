@@ -148,7 +148,7 @@ class AppState:
             kind = resolve_backend(self.config["backend"])
             info["backend"] = kind
             info["label"] = {"mlx": "MLX · APPLE GPU", "cuda": "CUDA · NVIDIA GPU",
-                             "cpu": "CPU", "test": "TEST ENGINE"}[kind]
+                             "cpu": "CPU", "test": "DEMO MODE" if os.environ.get("AVTOOL_DEMO") else "TEST ENGINE"}[kind]
             b = make_backend(self.config["backend"], self.settings["model"])
             try:
                 b.ensure_model(allow_download=False)

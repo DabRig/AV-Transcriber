@@ -46,7 +46,7 @@ class Glossary:
 
 def _term_pattern(term: str) -> re.Pattern:
     words = [re.escape(w) for w in term.split()]
-    # "Lightning OS" also matches "lightning os", "Lightning-OS", "Lightning  OS"
+    # "Northwind Studio" also matches "northwind studio", "Northwind-Studio", "Northwind  Studio"
     body = r"[\s\-]+".join(words)
     return re.compile(rf"(?<![\w]){body}(?![\w])", re.IGNORECASE)
 
@@ -71,7 +71,7 @@ def load_glossary(path: Optional[Path]) -> Glossary:
             continue
         if line not in terms:
             terms.append(line)
-    # Exact terms also fix capitalisation: "smooth scaling" -> "Smooth Scaling".
+    # Exact terms also fix capitalisation: "northwind studio" -> "Northwind Studio".
     for term in terms:
         fixes.append((_term_pattern(term), term))
     return Glossary(terms, fixes)
@@ -108,8 +108,8 @@ def clean_segments(segments: list[Segment], glossary_prompt: Optional[str] = Non
         # Known phantom phrases, when Whisper isn't confident they were spoken.
         if PHANTOM_PHRASES.search(text) and (seg.no_speech_prob > 0.2 or seg.avg_logprob < -0.7):
             continue
-        # The glossary list read back as if spoken ("Evan, Smooth Scaling, ...").
-        # A single term said on its own ("Lightning OS.") is kept.
+        # The glossary list read back as if spoken ("Jordan Rivera, Northwind Studio, ...").
+        # A single term said on its own ("PixelForge.") is kept.
         if prompt_norm and "," in text and norm in prompt_norm and len(norm) >= len(prompt_norm) / 2:
             continue
         # The same line again and again: keep the first two, drop the rest.

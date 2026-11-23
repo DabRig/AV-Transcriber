@@ -8,7 +8,7 @@
 
 set -eo pipefail
 cd "$(dirname "$0")"
-URL="https://github.com/DabRig/AVTool_CMOS/archive/refs/heads/claude/optimistic-thompson-as38s7.zip"
+URL="https://github.com/DabRig/av-transcriber/archive/refs/heads/main.zip"
 
 printf "\n\033[1mUpdating AV Transcriber…\033[0m\n"
 TMP="$(mktemp -d)"

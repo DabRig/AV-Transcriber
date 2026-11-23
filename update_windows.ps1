@@ -7,7 +7,7 @@
 
 $ErrorActionPreference = "Stop"
 Set-Location -LiteralPath $PSScriptRoot
-$url = "https://github.com/DabRig/AVTool_CMOS/archive/refs/heads/claude/optimistic-thompson-as38s7.zip"
+$url = "https://github.com/DabRig/av-transcriber/archive/refs/heads/main.zip"
 
 Write-Host ""
 Write-Host "Updating AV Transcriber..." -ForegroundColor Cyan

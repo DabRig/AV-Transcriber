@@ -60,11 +60,11 @@ def test_full_batch_every_format(clips, tmp_path, capsys):
     code = run_tool(clips, tmp_path=tmp_path)
     assert code == 1  # one file (corrupt.mov) failed, so the exit code says so...
     out = capsys.readouterr().out
-    assert "done 14" in out and "skipped 1" in out and "failed 1" in out  # ...but the batch finished
+    assert "done 15" in out and "skipped 1" in out and "failed 1" in out  # ...but the batch finished
 
     for name in ["sample.mov", "sample.mp4", "sample.mkv", "sample.webm", "sample.wmv",
-                 "sample.mp3", "sample.wav", "sample.flac", "sample.aac", "sample.m4a",
-                 "CAMERA_CLIP.MOV", "Évan’s talk 🎤 (take 2).mp4", "two_tracks.mov", "silent.mp4"]:
+                 "sample.mp3", "sample.wav", "sample.flac", "sample.aac", "sample.m4a", "sample.caf",
+                 "CAMERA_CLIP.MOV", "Zoë’s talk 🎤 (take 2).mp4", "two_tracks.mov", "silent.mp4"]:
         for suffix in FORMATS:
             assert (clips / (name + suffix)).is_file(), name + suffix
 
@@ -115,7 +115,7 @@ def test_interrupt_leaves_nothing_half_done(clips, tmp_path, monkeypatch, capsys
     assert temp_leftovers(tmp_path) == []
     monkeypatch.delenv("AVTOOL_TEST_INTERRUPT_AT")
     assert run_tool(clips, tmp_path=tmp_path) == 1  # resumes and finishes (corrupt.mov still fails)
-    assert len(list(clips.glob("*.json"))) == 14
+    assert len(list(clips.glob("*.json"))) == 15
 
 
 def test_one_failure_does_not_stop_the_batch(clips, tmp_path, monkeypatch, capsys):
@@ -123,7 +123,7 @@ def test_one_failure_does_not_stop_the_batch(clips, tmp_path, monkeypatch, capsy
     run_tool(clips, tmp_path=tmp_path)
     out = capsys.readouterr().out
     assert "simulated transcription failure" in out
-    assert "done 13" in out and "failed 2" in out
+    assert "done 14" in out and "failed 2" in out
     assert temp_leftovers(tmp_path) == []
 
 
@@ -217,13 +217,13 @@ def test_srt_format_is_valid():
 
 def test_glossary(tmp_path):
     g = tmp_path / "g.txt"
-    g.write_text("# comment\nEvan\nLightning OS\nlightening os -> Lightning OS\nSmooth Scaling\n")
+    g.write_text("# comment\nJordan\nPixelForge\npixel forge -> PixelForge\nNorthwind Studio\n")
     gl = load_glossary(g)
-    assert gl.terms == ["Evan", "Lightning OS", "Smooth Scaling"]
-    assert gl.prompt == "Evan, Lightning OS, Smooth Scaling."
-    assert gl.apply("welcome to smooth scaling and lightening-OS, says evan") == \
-        "welcome to Smooth Scaling and Lightning OS, says Evan"
-    assert gl.apply("Evangelist") == "Evangelist"  # whole words only
+    assert gl.terms == ["Jordan", "PixelForge", "Northwind Studio"]
+    assert gl.prompt == "Jordan, PixelForge, Northwind Studio."
+    assert gl.apply("welcome to northwind studio and pixel-Forge, says jordan") == \
+        "welcome to Northwind Studio and PixelForge, says Jordan"
+    assert gl.apply("Jordanian") == "Jordanian"  # whole words only
 
 
 def test_cleanup_removes_phantoms_and_loops():
@@ -235,17 +235,17 @@ def test_cleanup_removes_phantoms_and_loops():
         Segment(8, 10, " Same line.", avg_logprob=-0.3),
         Segment(10, 12, " Same line.", avg_logprob=-0.3),
         Segment(12, 14, " mumble", avg_logprob=-1.5, no_speech_prob=0.9),
-        Segment(14, 16, " Evan, Lightning OS, Smooth Scaling.", avg_logprob=-0.5),
-        Segment(16, 18, " Lightning OS.", avg_logprob=-0.3),  # really said: keep it
+        Segment(14, 16, " Jordan, PixelForge, Northwind Studio.", avg_logprob=-0.5),
+        Segment(16, 18, " PixelForge.", avg_logprob=-0.3),  # really said: keep it
     ]
-    kept = [s.text for s in clean_segments(segs, "Evan, Lightning OS, Smooth Scaling.")]
-    assert kept == ["Real words here.", "Same line.", "Same line.", "Lightning OS."]
+    kept = [s.text for s in clean_segments(segs, "Jordan, PixelForge, Northwind Studio.")]
+    assert kept == ["Real words here.", "Same line.", "Same line.", "PixelForge."]
 
 
 def test_dragged_paths():
     if os.name != "nt":
-        assert clean_dragged_path("/Volumes/LaCie/My\\ Shoot/IMG\\ 1.MOV ") == "/Volumes/LaCie/My Shoot/IMG 1.MOV"
-        assert clean_dragged_path("'/Volumes/LaCie/My Shoot'") == "/Volumes/LaCie/My Shoot"
+        assert clean_dragged_path("/Volumes/MyDrive/My\\ Shoot/IMG\\ 1.MOV ") == "/Volumes/MyDrive/My Shoot/IMG 1.MOV"
+        assert clean_dragged_path("'/Volumes/MyDrive/My Shoot'") == "/Volumes/MyDrive/My Shoot"
 
 
 def test_homebrew_folder_added_to_path(monkeypatch, tmp_path):
@@ -300,3 +300,20 @@ def test_windows_long_paths(monkeypatch, tmp_path):
     assert not str(short).startswith("\\\\?\\")
     deep = tmp_path / ("x" * 120) / ("y" * 120) / "IMG_0042.MOV.timestamped.txt"
     assert str(writers.long_path(deep)).startswith("\\\\?\\")
+
+
+@pytest.mark.parametrize("codec", ["alac", "libopus", "pcm_s16le", "adpcm_ima_qt"])
+def test_caf_voice_memos(codec, tmp_path):
+    """Apple Core Audio Format (.caf), as Voice Memos and other Apple apps save
+    it, in each codec ffmpeg can write here. (AAC-in-CAF can't be written by
+    ffmpeg, but it reads it the same way.)"""
+    src = tmp_path / f"Voice Memo {codec}.CAF"  # upper-case extension, like some exports
+    made = subprocess.run(["ffmpeg", "-loglevel", "error", "-f", "lavfi", "-i", "sine=frequency=330:duration=4",
+                           "-ar", "48000", "-c:a", codec, "-f", "caf", str(src)])
+    if made.returncode != 0:
+        pytest.skip(f"this ffmpeg can't write {codec} CAF")
+    assert scan(src) == [src.resolve()]
+    assert run_tool(src, tmp_path=tmp_path) == 0
+    data = json.loads((tmp_path / (src.name + ".json")).read_text(encoding="utf-8"))
+    assert abs(data["source"]["duration_seconds"] - 4) < 0.2
+    assert (tmp_path / (src.name + ".srt")).exists()

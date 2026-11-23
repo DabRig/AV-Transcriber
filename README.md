@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/media/banner.jpg" alt="AV Transcriber: turn videos and voice memos into transcripts and subtitles, 100% offline" width="100%">
+  <img src="docs/media/banner.svg" alt="AV Transcriber: turn videos and voice memos into transcripts and subtitles, 100% offline" width="100%">
 </p>
 
 <p align="center">
@@ -35,7 +35,7 @@
 
 ## ✨ Why AV Transcriber
 
-|     |     |
+| Feature | What it means for you |
 | --- | --- |
 | 🔒 **Everything stays on your computer** | Your recordings never leave your machine. Unplug the Wi-Fi and it still works. |
 | 🎬 **Built for editors** | Subtitles drop straight into **Premiere Pro, CapCut and DaVinci Resolve**, plus a reels caption style for vertical video. |
@@ -44,7 +44,7 @@
 | ⚡ **Fast on the GPU you have** | Apple-silicon Macs use the MLX engine; Windows PCs with an NVIDIA card use CUDA. |
 | 🛟 **Never loses work** | Stop any time and START picks up where it left off. One broken file never stops the batch. |
 | 🔤 **Spells your names right** | A glossary of people, brands and products, with automatic fixes for words it keeps mishearing. |
-| 💸 **Free** | No accounts, no subscriptions, no per-minute fees. |
+| 💸 **Free for personal use** | No accounts, no subscriptions, no per-minute fees. Free for personal and other non-commercial use ([license](#-license)). |
 
 ---
 
@@ -171,6 +171,21 @@ flowchart LR
 
 ---
 
+## 📋 What you need
+
+| | 🍎 Mac | 🪟 Windows |
+| --- | --- | --- |
+| **System** | macOS on an Apple-silicon Mac (M1 or newer) for full speed. Intel Macs work, more slowly. | Windows 10 or 11, 64-bit |
+| **Graphics** | Built in | An **NVIDIA** card with 4 GB+ of video memory for full speed. Without one it runs on the CPU, more slowly. |
+| **Memory (RAM)** | 8 GB or more | 8 GB or more |
+| **Free disk space** | About 4 GB for the app and the speech model | About 5 GB for the app, the NVIDIA engine and the speech model |
+| **Internet** | Only during setup (about 2 GB of downloads) | Only during setup (about 3.5 GB of downloads) |
+
+While it works, it also needs a little room for the temporary audio of the file it's
+on (about 115 MB per hour of video). It's deleted after each file.
+
+---
+
 ## 🍎 Install on a Mac
 
 > Best on an **Apple-silicon Mac (M1 or newer)**, which uses the fast MLX engine. Intel Macs work too, on the CPU (slower). Internet is needed for setup only. About 15 minutes.
@@ -203,12 +218,34 @@ The header's ENGINE light should say **CUDA · NVIDIA GPU**. If it says **CPU**,
 
 ## 🔄 Updating
 
-| | |
+| Computer | How to update |
 | --- | --- |
 | 🍎 Mac | In Terminal: `cd ` + drag the project folder + Enter, then `bash update.command` |
 | 🪟 Windows | Double-click **update_windows.bat** |
 
 Updates keep your glossary, settings and transcripts.
+
+## 🧹 Uninstalling
+
+Your transcripts are never touched: they live next to your videos (or in the folder you picked).
+
+<details>
+<summary><b>🍎 On a Mac</b></summary>
+
+1. Drag the project folder to the Trash, and remove **AV Transcriber** from your Dock.
+2. Delete the speech model (about 1.6 GB, stored separately): in Finder press **⌘⇧G**, paste `~/.cache`, press Enter, and move the **huggingface** folder to the Trash. Skip this if another AI app on your Mac uses it.
+3. *Optional:* setup installed FFmpeg and Python with Homebrew. If nothing else needs them, run `brew uninstall ffmpeg python@3.12` in Terminal.
+4. Empty the Trash.
+</details>
+
+<details>
+<summary><b>🪟 On Windows</b></summary>
+
+1. Delete the **AV Transcriber** folder and the Desktop shortcut. For the Start menu entry: right-click **AV Transcriber** in the Start menu › **Open file location**, and delete the shortcut there.
+2. Delete the speech model (about 1.6 GB, stored separately): paste `%USERPROFILE%\.cache` into File Explorer's address bar, press Enter, and delete the **huggingface** folder. Skip this if another AI app on your PC uses it.
+3. Delete the app's log folder: paste `%LOCALAPPDATA%\AV Transcriber` into the address bar and delete it.
+4. *Optional:* setup installed FFmpeg and Python with winget. If nothing else needs them, open **Terminal** or **PowerShell** and run `winget uninstall Gyan.FFmpeg` and `winget uninstall Python.Python.3.12`.
+</details>
 
 ---
 
@@ -237,8 +274,21 @@ library's usage statistics.
 <details>
 <summary><b>How do I transcribe my iPhone Voice Memos?</b></summary>
 
-On a Mac, open Voice Memos, select the recordings and drag them into AV Transcriber
-(or onto a folder first). Voice Memos are saved as `.m4a` or `.caf`; both work.
+Voice Memos are saved as `.m4a` or `.caf`, and both work. First get them onto your computer:
+
+**On a Mac**
+- If your iPhone and Mac use the same Apple Account with iCloud turned on for Voice Memos, your recordings are already in the Mac's **Voice Memos** app. Select them and drag them into AV Transcriber (or into a folder first).
+- Or **AirDrop** them from the iPhone: tap a recording › **•••** › **Share** › **AirDrop**.
+
+**On a Windows PC (or any computer)**
+
+In Voice Memos on the iPhone, tap a recording › **•••** › **Share**, then pick whichever is easiest:
+- **Blip**, or any other file-transfer app you already use.
+- **Save to Files**, to iCloud Drive (then open it on the PC with iCloud for Windows or at icloud.com) or to a USB drive plugged into the iPhone.
+- **Email** it to yourself and download the attachment.
+- **Dropbox** (or Google Drive / OneDrive): save it there, then download it on the PC.
+
+Then drag the files into AV Transcriber, or use **＋ FILES**.
 </details>
 
 <details>
@@ -247,6 +297,16 @@ On a Mac, open Voice Memos, select the recordings and drag them into AV Transcri
 It depends on your computer. The first file shows the real speed: "12× real time"
 means a 48-minute video takes about 4 minutes. Apple-silicon Macs and NVIDIA PCs
 run several times faster than real time.
+</details>
+
+<details>
+<summary><b>Which languages does it understand?</b></summary>
+
+Whisper understands about 99 languages. In SETTINGS, choose **EN** (English), **ES**
+(Spanish) or **AUTO**, which detects any of them from the first 30 seconds. On the
+command line, `--lang` takes any language code, such as `--lang fr` for French or
+`--lang de` for German. Setting the language, rather than AUTO, gives the most
+reliable results.
 </details>
 
 <details>
@@ -325,16 +385,23 @@ Free for personal and other **non-commercial** use under the
 [PolyForm Noncommercial License 1.0.0](LICENSE.md). The Sebastian Success logo and
 app icon are © Sebastian Success, all rights reserved.
 
+Want to use AV Transcriber at a company or for commercial work? Please ask first:
+reach out through [my GitHub profile](https://github.com/DabRig).
+
 ---
 
 <p align="center">
-  Made with 💙 by <b>Sebastian Success</b>
+  Made with 💙 by <a href="https://github.com/DabRig"><b>Sebastian Success</b></a>
 </p>
 
 <p align="center">
-  If AV Transcriber saved you some time, you can buy me a coffee ☕
+  If AV Transcriber saved you some time, ⭐ <a href="https://github.com/DabRig/av-transcriber">star the repo</a>, and you can buy me a coffee ☕
 </p>
 
 <p align="center">
   <a href="https://buymeacoffee.com/sebastiansuccess"><img src="docs/images/buy-me-a-coffee.svg" alt="Buy me a coffee" width="236" height="56"></a>
+</p>
+
+<p align="center">
+  <sub>More from me: <a href="https://github.com/DabRig/Desktop-Weather-Radar">🌦️ Desktop Weather Radar</a></sub>
 </p>

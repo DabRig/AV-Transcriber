@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/media/banner.jpg" alt="AV Transcriber: turn videos and voice memos into transcripts and subtitles, 100% offline" width="100%">
+  <img src="docs/media/banner.svg" alt="AV Transcriber: turn videos and voice memos into transcripts and subtitles, 100% offline" width="100%">
 </p>
 
 <p align="center">
@@ -35,7 +35,7 @@
 
 ## ✨ Why AV Transcriber
 
-|     |     |
+| Feature | What it means for you |
 | --- | --- |
 | 🔒 **Everything stays on your computer** | Your recordings never leave your machine. Unplug the Wi-Fi and it still works. |
 | 🎬 **Built for editors** | Subtitles drop straight into **Premiere Pro, CapCut and DaVinci Resolve**, plus a reels caption style for vertical video. |
@@ -203,7 +203,7 @@ The header's ENGINE light should say **CUDA · NVIDIA GPU**. If it says **CPU**,
 
 ## 🔄 Updating
 
-| | |
+| Computer | How to update |
 | --- | --- |
 | 🍎 Mac | In Terminal: `cd ` + drag the project folder + Enter, then `bash update.command` |
 | 🪟 Windows | Double-click **update_windows.bat** |
